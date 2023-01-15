@@ -25,6 +25,8 @@ import vttp2022.paf.assessment.eshop.models.Customer;
 import vttp2022.paf.assessment.eshop.models.LineItem;
 import vttp2022.paf.assessment.eshop.models.Order;
 import vttp2022.paf.assessment.eshop.services.CustomerService;
+import vttp2022.paf.assessment.eshop.services.OrderService;
+import vttp2022.paf.assessment.eshop.services.exceptions.OrderException;
 
 import static vttp2022.paf.assessment.eshop.Utils.*;
 
@@ -35,6 +37,9 @@ public class OrderController {
 
 	@Autowired
 	private CustomerService custSvc;
+
+	@Autowired
+	private OrderService orderSvc;
 
 	//TODO: Task 3
 	@PostMapping(path = "/api/order", consumes=MediaType.APPLICATION_JSON_VALUE, produces=MediaType.APPLICATION_JSON_VALUE)
@@ -92,7 +97,19 @@ public class OrderController {
 		}
 		order.setLineItems(lineItems);
 
-        // save order
+        // save order and line items to db
+    try {
+		orderSvc.createOrder(order);
+	  } catch (OrderException ex) {
+		JsonObject errJson = Json
+		  .createObjectBuilder()
+		  .add("error", "Cannot create order %s".formatted(order.getOrderId()))
+		  .build();
+		return ResponseEntity
+		  .status(HttpStatus.INTERNAL_SERVER_ERROR)
+		  .body(errJson.toString());
+	  }
+   
 
 		return null;
 	}
