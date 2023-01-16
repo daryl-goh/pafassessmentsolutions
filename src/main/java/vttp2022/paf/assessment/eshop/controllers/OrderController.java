@@ -4,6 +4,7 @@ package vttp2022.paf.assessment.eshop.controllers;
 import java.io.StringReader;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -11,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +29,7 @@ import vttp2022.paf.assessment.eshop.models.Customer;
 import vttp2022.paf.assessment.eshop.models.LineItem;
 import vttp2022.paf.assessment.eshop.models.Order;
 import vttp2022.paf.assessment.eshop.models.OrderStatus;
+import vttp2022.paf.assessment.eshop.respositories.OrderRepository;
 import vttp2022.paf.assessment.eshop.services.CustomerService;
 import vttp2022.paf.assessment.eshop.services.OrderService;
 import vttp2022.paf.assessment.eshop.services.WarehouseService;
@@ -44,6 +48,9 @@ public class OrderController {
 
 	@Autowired
 	private WarehouseService warehouseSvc;
+
+	@Autowired
+	private OrderRepository orderRepo;
 
 	//TODO: Task 3
 	@PostMapping(path = "/api/order", consumes=MediaType.APPLICATION_JSON_VALUE, produces=MediaType.APPLICATION_JSON_VALUE)
@@ -145,4 +152,17 @@ public class OrderController {
       return ResponseEntity.ok(resp.toString());
 
 	}
+
+	@GetMapping(path = "/api/order/{name}/status", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> getOrderCounts(@PathVariable String name) {
+		Map<String, Integer> orderCountsMap = orderRepo.getOrderCounts(name);
+
+		JsonObject resp = Json
+		.createObjectBuilder()
+		.add("name", name)
+		.add("dispatched", orderCountsMap.getOrDefault("dispatched", 0))
+		.add("pending", orderCountsMap.getOrDefault("pending", 0))
+		.build();
+    return ResponseEntity.ok(resp.toString());
+  }
 }
