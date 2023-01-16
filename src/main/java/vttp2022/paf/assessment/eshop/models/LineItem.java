@@ -1,5 +1,6 @@
 package vttp2022.paf.assessment.eshop.models;
 
+import jakarta.json.Json;
 import jakarta.json.JsonObject;
 
 // DO NOT CHANGE THIS CLASS
@@ -20,4 +21,17 @@ public class LineItem {
         l.setQuantity(jo.getInt("quantity"));
         return l;
     }
+
+	// Created
+
+	public JsonObject toJson() {
+		JsonObject json = Json
+		.createObjectBuilder()
+		.add("item", item)
+		.add("quantity", quantity)
+        .build();
+		return json;
+	}
+
+
 }

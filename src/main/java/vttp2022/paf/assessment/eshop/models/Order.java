@@ -4,6 +4,11 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import jakarta.json.Json;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonArrayBuilder;
+import jakarta.json.JsonObject;
+
 // DO NOT CHANGE THIS CLASS
 public class Order {
 
@@ -53,5 +58,35 @@ public class Order {
 	public List<LineItem> getLineItems() { return this.lineItems; }
 	public void setLineItems(List<LineItem> lineItems) { this.lineItems = lineItems; }
 	public void addLineItem(LineItem lineItem) { this.lineItems.add(lineItem); }
+
+	// Created
+    public JsonObject toJson(String createdBy) {
+
+		// convert line item into list of JsonObjects
+		List<JsonObject> lineItemsJsonList = lineItems
+		.stream()
+		.map(li -> li.toJson())
+		.toList();
+
+		// add line item JsonObjects into JsonArray
+		JsonArrayBuilder arrBuilder = Json.createArrayBuilder();
+		for (JsonObject li: lineItemsJsonList) {
+			arrBuilder.add(li);
+		}
+
+		// build the JsonArray of LineItem
+		JsonArray lineItemsArray = arrBuilder.build();
+		
+		JsonObject json = Json.createObjectBuilder()
+		.add("orderId", orderId)
+		.add("name", name)
+		.add("address", address)
+		.add("email", email )
+		.add("lineItems", lineItemsArray)
+		.add("createdBy", createdBy)
+		.build();
+
+        return json;
+    }
 }
 

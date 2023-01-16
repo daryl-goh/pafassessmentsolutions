@@ -8,17 +8,22 @@ import org.springframework.transaction.annotation.Transactional;
 
 import vttp2022.paf.assessment.eshop.models.LineItem;
 import vttp2022.paf.assessment.eshop.models.Order;
+import vttp2022.paf.assessment.eshop.models.OrderStatus;
 import vttp2022.paf.assessment.eshop.respositories.LineItemRepository;
 import vttp2022.paf.assessment.eshop.respositories.OrderRepository;
+import vttp2022.paf.assessment.eshop.respositories.OrderStatusRepository;
 import vttp2022.paf.assessment.eshop.services.exceptions.OrderException;
 
 @Service
 public class OrderService {
 @Autowired
-private OrderRepository orderRepo;
+OrderRepository orderRepo;
 
 @Autowired
-private LineItemRepository lineItemRepo;
+LineItemRepository lineItemRepo;
+
+@Autowired
+OrderStatusRepository orderStatusRepo;
 
     // if anything fails to save, then rollback  
     @Transactional(rollbackFor = OrderException.class)    
@@ -36,5 +41,9 @@ private LineItemRepository lineItemRepo;
             !lineItemRepo.createLineItem(order.getOrderId(), li)
         ) throw new OrderException("Cannot create line item");
         }
+    }
+
+    public boolean  createOrderStatus(OrderStatus orderStatus) {
+        return orderStatusRepo.createOrderStatus(orderStatus);
     }
 }

@@ -24,11 +24,11 @@ import jakarta.json.JsonValue;
 import vttp2022.paf.assessment.eshop.models.Customer;
 import vttp2022.paf.assessment.eshop.models.LineItem;
 import vttp2022.paf.assessment.eshop.models.Order;
+import vttp2022.paf.assessment.eshop.models.OrderStatus;
 import vttp2022.paf.assessment.eshop.services.CustomerService;
 import vttp2022.paf.assessment.eshop.services.OrderService;
+import vttp2022.paf.assessment.eshop.services.WarehouseService;
 import vttp2022.paf.assessment.eshop.services.exceptions.OrderException;
-
-import static vttp2022.paf.assessment.eshop.Utils.*;
 
 
 @RestController
@@ -40,6 +40,9 @@ public class OrderController {
 
 	@Autowired
 	private OrderService orderSvc;
+
+	@Autowired
+	private WarehouseService warehouseSvc;
 
 	//TODO: Task 3
 	@PostMapping(path = "/api/order", consumes=MediaType.APPLICATION_JSON_VALUE, produces=MediaType.APPLICATION_JSON_VALUE)
@@ -109,7 +112,21 @@ public class OrderController {
 		  .status(HttpStatus.INTERNAL_SERVER_ERROR)
 		  .body(errJson.toString());
 	  }
-   
+
+	  // dispatch the order
+	  OrderStatus orderStatus = warehouseSvc.dispatch(order);
+	  
+	  // save order status
+	  if(!orderSvc.createOrderStatus(orderStatus)){
+		JsonObject error = Json
+		  .createObjectBuilder()
+		  .add("error", "Cannot create order status".formatted(order.getOrderId()))
+		  .build();
+
+		return ResponseEntity
+		  .status(HttpStatus.INTERNAL_SERVER_ERROR)
+		  .body(error.toString());
+	  };
 
 		return null;
 	}

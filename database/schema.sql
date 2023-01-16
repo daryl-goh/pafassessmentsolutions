@@ -39,4 +39,15 @@ create table line_items (
     quantity int not null,
     primary key(order_id, item),
     foreign key (order_id) references orders (order_id)
-)
+);
+
+drop table if exists order_status;
+
+create table order_status (
+    order_id char(8) not null,
+    delivery_id varchar(128),
+    status enum('pending', 'dispatched'),
+    status_update date,
+    primary key (order_id),
+    foreign key (order_id) references orders (order_id)
+);

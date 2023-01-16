@@ -17,5 +17,11 @@ public class Queries {
             insert into line_items  (order_id, item, quantity)
             values (?,?,?)
             """;
-    
+
+    public static final String SQL_INSERT_INTO_ORDER_STATUS = 
+    """
+            insert into order_status (order_id, delivery_id, status, status_update)
+            values (?,?,?,?)
+            """;
+                   
 }
