@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonReader;
 import jakarta.json.JsonValue;
 import vttp2022.paf.assessment.eshop.models.Customer;
@@ -128,8 +129,20 @@ public class OrderController {
 		  .body(error.toString());
 	  };
 
-		return null;
-	}
-	
+	  // build response
+	  JsonObjectBuilder job = Json
+	  .createObjectBuilder()
+      .add("orderId", orderStatus.getOrderId())
+	  .add("status", orderStatus.getStatus());
 
+	  // include deliveryId if status is dispatched
+	  if(orderStatus.getStatus().equals("dispatched")){
+        job.add("deliveryId", orderStatus.getDeliveryId());
+      }
+
+	  JsonObject resp = job.build();
+
+      return ResponseEntity.ok(resp.toString());
+
+	}
 }
